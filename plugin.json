@@ -1,11 +1,11 @@
 {
-  "name": "Example Plugin",
-  "author": "John Doe",
-  "flags": ["debug", "_root"],
+  "name": "Discord Integration",
+  "author": "Decky Chat Project",
+  "flags": ["debug"],
   "api_version": 1,
   "publish": {
-    "tags": ["template", "root"],
-    "description": "Decky example plugin.",
+    "tags": ["discord", "chat", "voice", "social"],
+    "description": "Seamlessly integrate Discord features (text chat, voice/video calls, screen sharing) into your Steam Deck Gaming Mode.",
     "image": "https://opengraph.githubassets.com/1/SteamDeckHomebrew/PluginLoader"
   }
 }

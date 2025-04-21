@@ -1,57 +1,137 @@
 import os
-
-# The decky plugin module is located at decky-loader/plugin
-# For easy intellisense checkout the decky-loader code repo
-# and add the `decky-loader/plugin/imports` path to `python.analysis.extraPaths` in `.vscode/settings.json`
 import decky
 import asyncio
+import json
+from typing import Optional, Dict, Any
 
 class Plugin:
-    # A normal method. It can be called from the TypeScript side using @decky/api.
-    async def add(self, left: int, right: int) -> int:
-        return left + right
+    # Store Discord connection state
+    discord_client: Optional[Dict[str, Any]] = None
+    settings_dir: str = ""
+    
+    async def _initialize_settings(self):
+        """Initialize plugin settings directory and files"""
+        self.settings_dir = os.path.join(decky.DECKY_SETTINGS_DIR, "decky-discord")
+        os.makedirs(self.settings_dir, exist_ok=True)
+        
+        # Create settings file if it doesn't exist
+        settings_path = os.path.join(self.settings_dir, "settings.json")
+        if not os.path.exists(settings_path):
+            default_settings = {
+                "token": None,
+                "auto_connect": False,
+                "last_channel": None,
+                "last_server": None
+            }
+            with open(settings_path, 'w') as f:
+                json.dump(default_settings, f)
 
-    async def long_running(self):
-        await asyncio.sleep(15)
-        # Passing through a bunch of random data, just as an example
-        await decky.emit("timer_event", "Hello from the backend!", True, 2)
+    async def connect_discord(self) -> bool:
+        """Connect to Discord"""
+        try:
+            # TODO: Implement Discord connection logic
+            decky.logger.info("Connecting to Discord...")
+            # For now, just emit a success event
+            await decky.emit("discord_connected", True)
+            return True
+        except Exception as e:
+            decky.logger.error(f"Discord connection failed: {str(e)}")
+            await decky.emit("discord_error", str(e))
+            return False
 
-    # Asyncio-compatible long-running code, executed in a task when the plugin is loaded
+    async def disconnect_discord(self) -> bool:
+        """Disconnect from Discord"""
+        try:
+            # TODO: Implement Discord disconnection logic
+            decky.logger.info("Disconnecting from Discord...")
+            await decky.emit("discord_disconnected", True)
+            return True
+        except Exception as e:
+            decky.logger.error(f"Discord disconnection failed: {str(e)}")
+            await decky.emit("discord_error", str(e))
+            return False
+
+    async def get_servers(self) -> list:
+        """Get list of Discord servers"""
+        # TODO: Implement server list retrieval
+        return []
+
+    async def get_channels(self, server_id: str) -> list:
+        """Get list of channels for a server"""
+        # TODO: Implement channel list retrieval
+        return []
+
+    async def send_message(self, channel_id: str, content: str) -> bool:
+        """Send a message to a Discord channel"""
+        try:
+            # TODO: Implement message sending
+            decky.logger.info(f"Sending message to channel {channel_id}: {content}")
+            return True
+        except Exception as e:
+            decky.logger.error(f"Failed to send message: {str(e)}")
+            return False
+
+    async def join_voice(self, channel_id: str) -> bool:
+        """Join a voice channel"""
+        try:
+            # TODO: Implement voice channel joining
+            decky.logger.info(f"Joining voice channel {channel_id}")
+            return True
+        except Exception as e:
+            decky.logger.error(f"Failed to join voice channel: {str(e)}")
+            return False
+
+    async def leave_voice(self) -> bool:
+        """Leave current voice channel"""
+        try:
+            # TODO: Implement voice channel leaving
+            decky.logger.info("Leaving voice channel")
+            return True
+        except Exception as e:
+            decky.logger.error(f"Failed to leave voice channel: {str(e)}")
+            return False
+
+    async def start_screen_share(self) -> bool:
+        """Start screen sharing"""
+        try:
+            # TODO: Implement screen sharing
+            decky.logger.info("Starting screen share")
+            return True
+        except Exception as e:
+            decky.logger.error(f"Failed to start screen share: {str(e)}")
+            return False
+
+    async def stop_screen_share(self) -> bool:
+        """Stop screen sharing"""
+        try:
+            # TODO: Implement screen share stopping
+            decky.logger.info("Stopping screen share")
+            return True
+        except Exception as e:
+            decky.logger.error(f"Failed to stop screen share: {str(e)}")
+            return False
+
+    # Plugin lifecycle methods
     async def _main(self):
         self.loop = asyncio.get_event_loop()
-        decky.logger.info("Hello World!")
+        await self._initialize_settings()
+        decky.logger.info("Discord Integration plugin initialized")
 
-    # Function called first during the unload process, utilize this to handle your plugin being stopped, but not
-    # completely removed
     async def _unload(self):
-        decky.logger.info("Goodnight World!")
-        pass
+        """Handle plugin being stopped"""
+        await self.disconnect_discord()
+        decky.logger.info("Discord Integration plugin unloaded")
 
-    # Function called after `_unload` during uninstall, utilize this to clean up processes and other remnants of your
-    # plugin that may remain on the system
     async def _uninstall(self):
-        decky.logger.info("Goodbye World!")
-        pass
+        """Clean up during uninstall"""
+        await self.disconnect_discord()
+        # TODO: Clean up any stored credentials/data
+        decky.logger.info("Discord Integration plugin uninstalled")
 
-    async def start_timer(self):
-        self.loop.create_task(self.long_running())
-
-    # Migrations that should be performed before entering `_main()`.
     async def _migration(self):
-        decky.logger.info("Migrating")
-        # Here's a migration example for logs:
-        # - `~/.config/decky-template/template.log` will be migrated to `decky.decky_LOG_DIR/template.log`
-        decky.migrate_logs(os.path.join(decky.DECKY_USER_HOME,
-                                               ".config", "decky-template", "template.log"))
-        # Here's a migration example for settings:
-        # - `~/homebrew/settings/template.json` is migrated to `decky.decky_SETTINGS_DIR/template.json`
-        # - `~/.config/decky-template/` all files and directories under this root are migrated to `decky.decky_SETTINGS_DIR/`
+        """Handle plugin migration"""
+        decky.logger.info("Running Discord Integration plugin migrations")
+        # Migrate settings from old locations if they exist
         decky.migrate_settings(
-            os.path.join(decky.DECKY_HOME, "settings", "template.json"),
-            os.path.join(decky.DECKY_USER_HOME, ".config", "decky-template"))
-        # Here's a migration example for runtime data:
-        # - `~/homebrew/template/` all files and directories under this root are migrated to `decky.decky_RUNTIME_DIR/`
-        # - `~/.local/share/decky-template/` all files and directories under this root are migrated to `decky.decky_RUNTIME_DIR/`
-        decky.migrate_runtime(
-            os.path.join(decky.DECKY_HOME, "template"),
-            os.path.join(decky.DECKY_USER_HOME, ".local", "share", "decky-template"))
+            os.path.join(decky.DECKY_HOME, "settings", "decky-discord.json"),
+            os.path.join(decky.DECKY_USER_HOME, ".config", "decky-discord"))
