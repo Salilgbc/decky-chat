@@ -1,14 +1,16 @@
 # Build output
 dist/
 build/
+out/
 *.pyc
 __pycache__/
 
 # Dependencies
 node_modules/
-backend/py_modules/
+py_modules/
 
-# Development environment
+# Environment
+.env
 .vscode/
 .idea/
 *.swp
@@ -17,3 +19,4 @@ backend/py_modules/
 # Plugin specific
 *.log
 settings/
+discord_config.json
