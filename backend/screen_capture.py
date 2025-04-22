@@ -1,0 +1,1 @@
+[Content from screen_capture.py]
