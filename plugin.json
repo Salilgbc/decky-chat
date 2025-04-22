@@ -1,11 +1,3 @@
 {
   "name": "Discord Integration",
-  "author": "Decky Chat Project",
-  "flags": ["debug"],
-  "api_version": 1,
-  "publish": {
-    "tags": ["discord", "chat", "voice", "social"],
-    "description": "Seamlessly integrate Discord features into your Steam Deck Gaming Mode.",
-    "image": "https://opengraph.githubassets.com/1/SteamDeckHomebrew/PluginLoader"
-  }
-}
+  "author": "Decky Chat Project",...
